@@ -4,6 +4,9 @@ const bodyParser = require("body-parser"); // Importa o body-parser
 
 const PORT = 9000; // Porta TCP do servidor HTTP da aplicação
 
+//Variáveis usadas no EJS (padrão)
+let config = { titulo: "", rodape: "" };
+
 const app = express(); // Instância para uso do Express
 
 // Cria conexão com obanco de dados
@@ -45,7 +48,10 @@ app.get("/", (req, res) => {
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/
   // res.send(index);
   console.log("GET /index");
-  res.render("pages/index");
+
+  config = { title: "Página inicial", rodape: "" };
+
+  res.render("pages/index", config);
   // res.redirect("/cadastro"); // Redireciona para a ROTA cadastro
 });
 
@@ -62,7 +68,8 @@ app.get("/usuarios", (req, res) => {
 app.get("/cadastro", (req, res) => {
   console.log("GET /cadastro");
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/cadastro
-  res.render("pages/cadastro");
+  config = { title: "Você está na página cadastro", rodape: "" };
+  res.render("pages/cadastro", config);
 });
 
 // POST do cadastro
@@ -111,13 +118,15 @@ app.post("/cadastro", (req, res) => {
 app.get("/sobre", (req, res) => {
   console.log("GET /sobre");
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/sobre
-  res.render("pages/sobre");
+  config = { title: "Saiba mais", rodape: "" };
+  res.render("pages/sobre", config);
 });
 
 app.get("/login", (req, res) => {
   console.log("GET /login");
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/info
-  res.render("pages/login");
+  config = { title: "Você está na página Login", rodape: "" };
+  res.render("pages/login", config);
 });
 
 app.post("/login", (req, res) => {
@@ -128,7 +137,8 @@ app.post("/login", (req, res) => {
 app.get("/dashboard", (req, res) => {
   console.log("GET /dashboard");
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/info
-  res.render("pages/dashboard");
+  config = { title: "Você está na página Dashboard" };
+  res.render("pages/dashboard", config);
 });
 
 // app.listen() deve ser o último comando da aplicação (app.js)

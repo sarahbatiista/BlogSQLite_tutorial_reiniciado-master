@@ -1,6 +1,27 @@
 <table>
   <thead>
     <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Email</th>
+      <th>Celular</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for(let index = 0; index < 101; index++) { %>
+
+    <tr>
+      <td><%= index %></td>
+      <td>nome</td>
+      <td>email</td>
+      <td>celular</td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<!-- <table>
+  <thead>
+    <tr>
       <th scope="col">ID</th>
       <th scope="col">Nome</th>
       <th scope="col">Email</th>
@@ -27,4 +48,4 @@
       <td>CELULAR</td>
     </tr>
   </tbody>
-</table>
+</table> -->
