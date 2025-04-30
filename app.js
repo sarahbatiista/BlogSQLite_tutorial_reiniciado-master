@@ -1,6 +1,7 @@
 const express = require("express"); // importa lib do Express
 const sqlite3 = require("sqlite3"); // Importa lib do sqlite3
 const bodyParser = require("body-parser"); // Importa o body-parser
+const session = require("express-session"); // importa o express-session
 
 const PORT = 9000; // Porta TCP do servidor HTTP da aplicação
 
@@ -16,9 +17,17 @@ db.serialize(() => {
   // Este método permite enviar comandos SQL em modo 'sequencial'
   db.run(
     `CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    username TEXT, password TEXT, email TEXT, celular TEXT, cpf TEXT, rg TEXT)`
+    username TEXT, password TEXT, email TEXT, tel TEXT, cpf TEXT, rg TEXT)`
   );
 });
+
+app.use(
+  session({
+    secret: "qualquersenha",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 
 // __dirname é a variável interna do nodejs que guarda o caminho absoluto do projeto, no SO
 // console.log(__dirname + "/static");
@@ -80,7 +89,7 @@ app.post("/cadastro", (req, res) => {
     ? console.log(`Body vazio: ${req.body}`)
     : console.log(JSON.stringify(req.body));
 
-  const { username, password, email, celular, cpf, rg } = req.body;
+  const { username, password, email, tel, cpf, rg } = req.body;
   // Colocar aqui as validações e inclusão no banco de dados do cadastro do usuário
   // 1. Validar dados do usuário
   // 2. saber se ele já existe no banco
@@ -96,16 +105,12 @@ app.post("/cadastro", (req, res) => {
     } else {
       // 3. Se usuário não existe no banco cadastrar
       const insertQuery =
-        "INSERT INTO users (username, password, email, celular, cpf, rg) VALUES (?,?,?,?,?,?)";
-      db.run(
-        insertQuery,
-        [username, password, email, celular, cpf, rg],
-        (err) => {
-          // Inserir a lógica do INSERT
-          if (err) throw err;
-          res.send("Usuário cadastrado, com sucesso");
-        }
-      );
+        "INSERT INTO users (username, password, email, tel, cpf, rg) VALUES (?,?,?,?,?,?)";
+      db.run(insertQuery, [username, password, email, tel, cpf, rg], (err) => {
+        // Inserir a lógica do INSERT
+        if (err) throw err;
+        res.send("Usuário cadastrado, com sucesso");
+      });
     }
   });
 
@@ -131,7 +136,25 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   console.log("POST /login");
-  res.send("Login ainda não implementado.");
+  const { username, password } = req.body;
+  console.log(JSON.stringify(req.body));
+
+  //Consultar o usuário no banco de dados
+  const query = "SELECT * FROM users WHERE username = ? AND password = ?";
+
+  db.get(query, [username, password], (err, row) => {
+    if (err) throw err;
+
+    //Se usuário válido -> registra a sessão e redireciona para o dashboard
+    if (row) {
+      req.session.logged = true;
+      req.session.username = username;
+      res.redirect("/dashboard");
+    } //Se não, envia mensagem de erro (Usuário inválido)
+    else {
+      res.send("Uusário inválido");
+    }
+  });
 });
 
 app.get("/dashboard", (req, res) => {

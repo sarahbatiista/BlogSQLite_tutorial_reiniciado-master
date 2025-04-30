@@ -1,14 +1,14 @@
 <table>
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Nome</th>
-      <th>Email</th>
-      <th>Celular</th>
+      <th scope="col">ID</th>
+      <th scope="col">Nome</th>
+      <th scope="col">Email</th>
+      <th scope="col">Celular</th>
     </tr>
   </thead>
   <tbody>
-    <% for(let index = 0; index < 101; index++) { %>
+    <% for(let index = 0; index < 9; index++) { %> <% if (index % 2 == 0) { %>
 
     <tr>
       <td><%= index %></td>
@@ -16,7 +16,7 @@
       <td>email</td>
       <td>celular</td>
     </tr>
-    <% } %>
+    <% } %> <% } %>
   </tbody>
 </table>
 <!-- <table>
