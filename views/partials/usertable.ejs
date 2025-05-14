@@ -1,51 +1,51 @@
+<%console.log(`usertable.ejs -> dados: ${JSON.stringify(dados)}`); %> <%
+if(req.session.loggedin) { %>
+
 <table>
   <thead>
     <tr>
       <th scope="col">ID</th>
       <th scope="col">Nome</th>
       <th scope="col">Email</th>
-      <th scope="col">Celular</th>
+      <th scope="col">Tel</th>
+      <th scope="col">Password</th>
     </tr>
   </thead>
   <tbody>
-    <% for(let index = 0; index < 9; index++) { %> <% if (index % 2 == 0) { %>
+    <% let index=1; dados.forEach(user =>{ %> <tr <%-
+    req.session.username==user.username ? `style="color: white; font-style:
+    bold;` : `` %>>
+    <td><%= user.id %></td>
+    <td><%= user.username %></td>
+    <td><%= user.email %></td>
+    <td><%= user.tel %></td>
+    <td><%= user.password %></td>
+    <% index++; }); %>
+  </tbody>
 
+  <tfoot>
     <tr>
-      <td><%= index %></td>
-      <td>nome</td>
-      <td>email</td>
-      <td>celular</td>
+      <th colspan="5" style="font-size: 16px">
+        <%= `Usuarios registrados: ${index-1}` %>
+      </th>
     </tr>
-    <% } %> <% } %>
-  </tbody>
+  </tfoot>
 </table>
-<!-- <table>
-  <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Nome</th>
-      <th scope="col">Email</th>
-      <th scope="col">Celular</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>1</td>
-      <td>NOME</td>
-      <td>EMAIL</td>
-      <td>CELULAR</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>NOME</td>
-      <td>EMAIL</td>
-      <td>CELULAR</td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>NOME</td>
-      <td>EMAIL</td>
-      <td>CELULAR</td>
-    </tr>
-  </tbody>
-</table> -->
+
+<% } else { %>
+<main
+  style="
+    padding: 20px;
+    text-align: center;
+    border: 10px solid red;
+    background-color: red;
+    font-size: 64px;
+    border-radius: 150px;
+  "
+>
+  ACESSO RESTRITO!!! <br />
+  VOCÊ FOI PARA O SAL!!! <br />
+  A POLICIA FEDERAL IRÁ APARECER NA SUA CASA!!!! AMANHÃ!!
+</main>
+
+<% } %>

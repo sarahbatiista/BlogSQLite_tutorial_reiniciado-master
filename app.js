@@ -1,6 +1,6 @@
 const express = require("express"); // importa lib do Express
 const sqlite3 = require("sqlite3"); // Importa lib do sqlite3
-const bodyParser = require("body-parser"); // Importa o body-parser
+// const bodyParser = require("body-parser"); // Importa o body-parser
 const session = require("express-session"); // importa o express-session
 
 const PORT = 9000; // Porta TCP do servidor HTTP da aplicação
@@ -38,7 +38,7 @@ app.use(
 app.use("/static", express.static(__dirname + "/static"));
 
 // Middleware para processar as requisições do Body Parameters do cliente
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 // Configurar EJS como o motor de visualização
 app.set("view engine", "ejs");
@@ -60,7 +60,9 @@ app.get("/", (req, res) => {
 
   config = { title: "Página inicial", rodape: "" };
 
-  res.render("pages/index", config);
+  res.render("pages/index", { ...config, req: req });
+
+  // res.render("pages/index", config);
   // res.redirect("/cadastro"); // Redireciona para a ROTA cadastro
 });
 
@@ -78,7 +80,11 @@ app.get("/cadastro", (req, res) => {
   console.log("GET /cadastro");
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/cadastro
   config = { title: "Você está na página cadastro", rodape: "" };
-  res.render("pages/cadastro", config);
+  if (!req.session.logged) {
+    res.render("pages/cadastro", { ...config, req: req });
+  } else {
+    res.redirect("/dashboard", config);
+  }
 });
 
 // POST do cadastro
@@ -124,23 +130,23 @@ app.get("/sobre", (req, res) => {
   console.log("GET /sobre");
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/sobre
   config = { title: "Saiba mais", rodape: "" };
-  res.render("pages/sobre", config);
+  res.render("pages/sobre", { ...config, req: req });
 });
 
 app.get("/login", (req, res) => {
   console.log("GET /login");
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/info
   config = { title: "Você está na página Login", rodape: "" };
-  res.render("pages/login", config);
+  res.render("pages/login", { ...config, req: req });
 });
 
 app.post("/login", (req, res) => {
   console.log("POST /login");
   const { username, password } = req.body;
-  console.log(JSON.stringify(req.body));
+  console.log(`req.body${JSON.stringify(req.body)}`);
 
   //Consultar o usuário no banco de dados
-  const query = "SELECT * FROM users WHERE username = ? AND password = ?";
+  const query = "SELECT * FROM users WHERE username=? AND password=?";
 
   db.get(query, [username, password], (err, row) => {
     if (err) throw err;
@@ -152,8 +158,15 @@ app.post("/login", (req, res) => {
       res.redirect("/dashboard");
     } //Se não, envia mensagem de erro (Usuário inválido)
     else {
-      res.send("Uusário inválido");
+      res.send("Usuário inválido");
     }
+  });
+});
+
+app.get("/logout", (req, res) => {
+  // Exemplo de uma rota (END POINT) controlado pela sessão do usuário logado.
+  req.session.destroy(() => {
+    res.redirect("/");
   });
 });
 
@@ -161,7 +174,28 @@ app.get("/dashboard", (req, res) => {
   console.log("GET /dashboard");
   // Rota raiz do meu servidor, acesse o browser com o endereço http://localhost:8000/info
   config = { title: "Você está na página Dashboard" };
-  res.render("pages/dashboard", config);
+
+  if (!req.session.loggedin) {
+    db.all("SELECT * FROM users", [], (err, row) => {
+      if (err) throw err;
+      res.render("pages/dashboard", { ...config, dados: row, req: req });
+    });
+  } else {
+    console.log("Tentativa de acesso à área restrita");
+    res.redirect("/");
+  }
+});
+
+app.get("/erro", (req, res) => {
+  console.log("GET /erro");
+  config = { title: "Erro", footer: "" };
+
+  res.render("pages/erro", { ...config, req: req });
+});
+
+app.use("*", (req, res) => {
+  config = { title: "Erro", footer: "" };
+  res.status(404).render("pages/erro", { ...config, req: req });
 });
 
 // app.listen() deve ser o último comando da aplicação (app.js)
